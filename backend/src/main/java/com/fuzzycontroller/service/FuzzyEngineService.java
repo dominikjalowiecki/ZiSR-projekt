@@ -193,10 +193,10 @@ public class FuzzyEngineService {
     private void defineDistanceSets() {
         Map<String, FuzzySet> sets = new LinkedHashMap<>();
 
-        sets.put("distVeryClose", triangle("distVeryClose",   0.0,  0.0,  25.0));
-        sets.put("distClose",     triangle("distClose",       30.0, 25.0, 35.0));
-        sets.put("distSafe",      triangle("distSafe",        90.0, 35.0, 45.0));
-        sets.put("distFar",       triangle("distFar",         180.0, 65.0, 0.0));
+        sets.put("distVeryClose", gaussian("distVeryClose",   0.0,  0.0,  25.0));
+        sets.put("distClose",     gaussian("distClose",       30.0, 25.0, 35.0));
+        sets.put("distSafe",      gaussian("distSafe",        90.0, 35.0, 45.0));
+        sets.put("distFar",       gaussian("distFar",         180.0, 65.0, 0.0));
 
         premiseSetsByVariable.put("distance", sets);
     }
@@ -204,10 +204,10 @@ public class FuzzyEngineService {
     private void defineRelSpeedSets() {
         Map<String, FuzzySet> sets = new LinkedHashMap<>();
 
-        sets.put("relApproachingFast", triangle("relApproachingFast", -25.0, 0.0, 12.0));
-        sets.put("relApproaching",     triangle("relApproaching",     -10.0, 12.0, 8.0));
-        sets.put("relStable",          triangle("relStable",            0.0, 6.0, 6.0));
-        sets.put("relReceding",        triangle("relReceding",         15.0, 8.0, 0.0));
+        sets.put("relApproachingFast", gaussian("relApproachingFast", -15.0, 0.0, 10.0));
+        sets.put("relApproaching",     gaussian("relApproaching",      -5.0, 5.0, 4.0));
+        sets.put("relStable",          gaussian("relStable",            0.0, 3.0, 3.0));
+        sets.put("relReceding",        gaussian("relReceding",          8.0, 4.0, 0.0));
 
         premiseSetsByVariable.put("relativeSpeed", sets);
     }
@@ -215,10 +215,10 @@ public class FuzzyEngineService {
     private void defineOwnSpeedSets() {
         Map<String, FuzzySet> sets = new LinkedHashMap<>();
 
-        sets.put("speedLow",      triangle("speedLow",       30.0,  30.0, 30.0));
-        sets.put("speedMedium",   triangle("speedMedium",    70.0,  30.0, 30.0));
-        sets.put("speedHigh",     triangle("speedHigh",     110.0,  30.0, 30.0));
-        sets.put("speedVeryHigh", triangle("speedVeryHigh", 160.0,  30.0, 0.0));
+        sets.put("speedLow",      gaussian("speedLow",       30.0,  30.0, 30.0));
+        sets.put("speedMedium",   gaussian("speedMedium",    70.0,  30.0, 30.0));
+        sets.put("speedHigh",     gaussian("speedHigh",     110.0,  30.0, 30.0));
+        sets.put("speedVeryHigh", gaussian("speedVeryHigh", 160.0,  30.0, 0.0));
 
         premiseSetsByVariable.put("ownSpeed", sets);
     }
@@ -226,9 +226,9 @@ public class FuzzyEngineService {
     private void defineRoadSets() {
         Map<String, FuzzySet> sets = new LinkedHashMap<>();
 
-        sets.put("roadPoor",     triangle("roadPoor",     0.0,  0.0,  0.4));
-        sets.put("roadModerate", triangle("roadModerate", 0.55, 0.3,  0.3));
-        sets.put("roadGood",     triangle("roadGood",     1.0,  0.4,  0.0));
+        sets.put("roadPoor",     gaussian("roadPoor",     0.0,  0.0,  0.4));
+        sets.put("roadModerate", gaussian("roadModerate", 0.55, 0.3,  0.3));
+        sets.put("roadGood",     gaussian("roadGood",     1.0,  0.4,  0.0));
 
         premiseSetsByVariable.put("roadCondition", sets);
     }
@@ -236,11 +236,11 @@ public class FuzzyEngineService {
     private void defineCurveSets() {
         Map<String, FuzzySet> sets = new LinkedHashMap<>();
 
-        sets.put("curveSharpLeft",   triangle("curveSharpLeft",   -0.04, 0.0,   0.025));
-        sets.put("curveGentleLeft",  triangle("curveGentleLeft",  -0.015, 0.025, 0.015));
-        sets.put("curveStraight",    triangle("curveStraight",     0.0,  0.015, 0.015));
-        sets.put("curveGentleRight", triangle("curveGentleRight",  0.015, 0.015, 0.025));
-        sets.put("curveSharpRight",  triangle("curveSharpRight",   0.04, 0.025, 0.0));
+        sets.put("curveSharpLeft",   gaussian("curveSharpLeft",   -0.04, 0.0,   0.025));
+        sets.put("curveGentleLeft",  gaussian("curveGentleLeft",  -0.015, 0.025, 0.015));
+        sets.put("curveStraight",    gaussian("curveStraight",     0.0,  0.015, 0.015));
+        sets.put("curveGentleRight", gaussian("curveGentleRight",  0.015, 0.015, 0.025));
+        sets.put("curveSharpRight",  gaussian("curveSharpRight",   0.04, 0.025, 0.0));
 
         premiseSetsByVariable.put("curvature", sets);
     }
@@ -248,35 +248,35 @@ public class FuzzyEngineService {
     private void defineOffsetSets() {
         Map<String, FuzzySet> sets = new LinkedHashMap<>();
 
-        sets.put("offsetLeftFar",   triangle("offsetLeftFar",   -1.5, 0.5, 0.7));
-        sets.put("offsetLeftNear",  triangle("offsetLeftNear",  -0.6, 0.7, 0.5));
-        sets.put("offsetCenter",    triangle("offsetCenter",     0.0, 0.4, 0.4));
-        sets.put("offsetRightNear", triangle("offsetRightNear",  0.6, 0.5, 0.7));
-        sets.put("offsetRightFar",  triangle("offsetRightFar",   1.5, 0.7, 0.5));
+        sets.put("offsetLeftFar",   gaussian("offsetLeftFar",   -1.5, 0.5, 0.7));
+        sets.put("offsetLeftNear",  gaussian("offsetLeftNear",  -0.6, 0.7, 0.5));
+        sets.put("offsetCenter",    gaussian("offsetCenter",     0.0, 0.4, 0.4));
+        sets.put("offsetRightNear", gaussian("offsetRightNear",  0.6, 0.5, 0.7));
+        sets.put("offsetRightFar",  gaussian("offsetRightFar",   1.5, 0.7, 0.5));
         
         premiseSetsByVariable.put("lateralOffset", sets);
     }
 
     private void addAccelConclusionSets(ReasoningSystem rs) {
-        rs.addConclusionSet(triangle("accBrakeHard", -0.85, 0.0,  0.45));
-        rs.addConclusionSet(triangle("accBrakeSoft", -0.4,  0.45, 0.4));
-        rs.addConclusionSet(triangle("accCoast",      0.0,  0.4,  0.4));
-        rs.addConclusionSet(triangle("accAccelSoft",  0.4,  0.4,  0.45));
-        rs.addConclusionSet(triangle("accAccelHard",  0.85, 0.45, 0.0));
+        rs.addConclusionSet(conclusionGaussian("accBrakeHard", -0.85, 0.0,  0.45));
+        rs.addConclusionSet(conclusionGaussian("accBrakeSoft", -0.4,  0.45, 0.4));
+        rs.addConclusionSet(conclusionGaussian("accCoast",      0.0,  0.4,  0.4));
+        rs.addConclusionSet(conclusionGaussian("accAccelSoft",  0.4,  0.4,  0.45));
+        rs.addConclusionSet(conclusionGaussian("accAccelHard",  0.85, 0.45, 0.0));
     }
 
     private void addSteerConclusionSets(ReasoningSystem rs) {
-        rs.addConclusionSet(triangle("steerLeftStrong",  -0.8, 0.0,  0.5));
-        rs.addConclusionSet(triangle("steerLeftMild",    -0.3, 0.5,  0.3));
-        rs.addConclusionSet(triangle("steerNeutral",      0.0, 0.3,  0.3));
-        rs.addConclusionSet(triangle("steerRightMild",    0.3, 0.3,  0.5));
-        rs.addConclusionSet(triangle("steerRightStrong",  0.8, 0.5,  0.0));
+        rs.addConclusionSet(conclusionGaussian("steerLeftStrong",  -0.8, 0.0,  0.5));
+        rs.addConclusionSet(conclusionGaussian("steerLeftMild",    -0.3, 0.5,  0.3));
+        rs.addConclusionSet(conclusionGaussian("steerNeutral",      0.0, 0.3,  0.3));
+        rs.addConclusionSet(conclusionGaussian("steerRightMild",    0.3, 0.3,  0.5));
+        rs.addConclusionSet(conclusionGaussian("steerRightStrong",  0.8, 0.5,  0.0));
     }
 
     private void addLaneConclusionSets(ReasoningSystem rs) {
-        rs.addConclusionSet(triangle("laneKeep",      0.0, 0.0, 0.35));
-        rs.addConclusionSet(triangle("lanePrepare",   0.5, 0.3, 0.3));
-        rs.addConclusionSet(triangle("laneChangeNow", 1.0, 0.35, 0.0));
+        rs.addConclusionSet(conclusionGaussian("laneKeep",      0.0, 0.0, 0.35));
+        rs.addConclusionSet(conclusionGaussian("lanePrepare",   0.5, 0.3, 0.3));
+        rs.addConclusionSet(conclusionGaussian("laneChangeNow", 1.0, 0.35, 0.0));
     }
 
     private void addAccelRules() throws Exception {
@@ -299,6 +299,14 @@ public class FuzzyEngineService {
         addRule(rsAccel, "acceleration", "accCoast",
                 "JEŻELI odległość bezpieczna I prędk. wzgl. stabilna TO toczenie",
                 ant("distance", "distSafe"), and("relativeSpeed", "relStable"));
+
+        addRule(rsAccel, "acceleration", "accBrakeSoft",
+                "JEŻELI odległość bezpieczna I prędk. wzgl. zbliża się TO łagodne hamowanie",
+                ant("distance", "distSafe"), and("relativeSpeed", "relApproaching"));
+
+        addRule(rsAccel, "acceleration", "accBrakeHard",
+                "JEŻELI odległość bezpieczna I prędk. wzgl. szybko zbliża TO mocne hamowanie",
+                ant("distance", "distSafe"), and("relativeSpeed", "relApproachingFast"));
 
         addRule(rsAccel, "acceleration", "accAccelSoft",
                 "JEŻELI odległość bezpieczna I prędk. wzgl. oddala się TO łagodne przyspieszenie",
@@ -382,6 +390,15 @@ public class FuzzyEngineService {
         addRule(rsLane, "laneChangeUrgency", "lanePrepare",
                 "JEŻELI odległość blisko I prędk. wzgl. zbliża się TO przygotuj zmianę",
                 ant("distance", "distClose"), and("relativeSpeed", "relApproaching"));
+        addRule(rsLane, "laneChangeUrgency", "laneChangeNow",
+                "JEŻELI odległość bezpieczna I prędk. wzgl. szybko zbliża TO zmień pas",
+                ant("distance", "distSafe"), and("relativeSpeed", "relApproachingFast"));
+        addRule(rsLane, "laneChangeUrgency", "laneChangeNow",
+                "JEŻELI odległość bardzo blisko TO zmień pas",
+                ant("distance", "distVeryClose"));
+        addRule(rsLane, "laneChangeUrgency", "lanePrepare",
+                "JEŻELI odległość blisko TO przygotuj zmianę",
+                ant("distance", "distClose"));
         addRule(rsLane, "laneChangeUrgency", "laneKeep",
                 "JEŻELI odległość bezpieczna TO utrzymaj pas",
                 ant("distance", "distSafe"));
@@ -400,6 +417,12 @@ public class FuzzyEngineService {
         addRule(rsLane, "laneChangeUrgency", "laneKeep",
                 "JEŻELI odległość blisko I prędk. własna niska TO utrzymaj pas",
                 ant("distance", "distClose"), and("ownSpeed", "speedLow"));
+        addRule(rsLane, "laneChangeUrgency", "laneKeep",
+                "JEŻELI odległość bardzo blisko I prędk. własna niska TO utrzymaj pas",
+                ant("distance", "distVeryClose"), and("ownSpeed", "speedLow"));
+        addRule(rsLane, "laneChangeUrgency", "laneKeep",
+                "JEŻELI prędk. wzgl. oddala się TO utrzymaj pas",
+                ant("relativeSpeed", "relReceding"));
     }
 
     private record Antecedent(String var, String set, String op) {}
@@ -462,7 +485,8 @@ public class FuzzyEngineService {
                 double m = (mem == null) ? 0.0 : mem.getOrDefault(a.set, 0.0);
                 activation = Math.min(activation, m);
             }
-            if (activation > 0.001) {
+            
+            if (activation > RULE_ACTIVATION_DISPLAY_THRESHOLD) {
                 activations.add(new RuleActivation(def.name, activation));
             }
         }
@@ -478,15 +502,50 @@ public class FuzzyEngineService {
         return "CHANGE_NOW";
     }
 
-    private FuzzySet triangle(String id, double center, double leftHalfWidth, double rightHalfWidth) {
+    private static final double GAUSS_SIGMA_FACTOR = 2.5;
+    private static final double GAUSS_SHOULDER_FACTOR = 4.0;
+    private static final double RULE_ACTIVATION_DISPLAY_THRESHOLD = 0.05;
+
+    private FuzzySet gaussian(String id, double center, double leftHalfWidth, double rightHalfWidth) {
         FuzzySet set = new FuzzySet(id, "");
 
-        double l = Math.max(leftHalfWidth, 0.0001);
-        double r = Math.max(rightHalfWidth, 0.0001);
+        boolean leftShoulder  = leftHalfWidth  <= 0.0;
+        boolean rightShoulder = rightHalfWidth <= 0.0;
 
-        set.addPoint(center - l, 0.0);
-        set.addPoint(center, 1.0);
-        set.addPoint(center + r, 0.0);
+        double leftSigma  = leftShoulder  ? 0.0 : leftHalfWidth  / GAUSS_SIGMA_FACTOR;
+        double rightSigma = rightShoulder ? 0.0 : rightHalfWidth / GAUSS_SIGMA_FACTOR;
+
+        if (leftShoulder && rightShoulder) {
+            leftSigma = rightSigma = 0.01;
+        } else if (leftShoulder) {
+            leftSigma = rightSigma * GAUSS_SHOULDER_FACTOR;
+        } else if (rightShoulder) {
+            rightSigma = leftSigma * GAUSS_SHOULDER_FACTOR;
+        }
+
+        set.newGaussian(center, leftSigma, rightSigma);
+
+        return set;
+    }
+
+    private FuzzySet conclusionGaussian(String id, double center, double leftHalfWidth, double rightHalfWidth) {
+        FuzzySet set = new FuzzySet(id, "");
+
+        boolean leftShoulder  = leftHalfWidth  <= 0.0;
+        boolean rightShoulder = rightHalfWidth <= 0.0;
+
+        double leftSigma  = leftShoulder  ? 0.0 : leftHalfWidth  / GAUSS_SIGMA_FACTOR;
+        double rightSigma = rightShoulder ? 0.0 : rightHalfWidth / GAUSS_SIGMA_FACTOR;
+
+        if (leftShoulder && rightShoulder) {
+            leftSigma = rightSigma = 0.01;
+        } else if (leftShoulder) {
+            leftSigma = rightSigma;
+        } else if (rightShoulder) {
+            rightSigma = leftSigma;
+        }
+
+        set.newGaussian(center, leftSigma, rightSigma);
 
         return set;
     }

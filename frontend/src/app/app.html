@@ -1,137 +1,184 @@
 <main>
   <h1>Rozmyty sterownik adaptacyjnego tempomatu z asystą pasa ruchu</h1>
 
-  <div class="layout">
-    <section class="panel">
-      <h3>Wejście</h3>
+  <nav class="tabs">
+    <button type="button" [class.active]="view() === 'manual'" (click)="view.set('manual')">
+      Tryb ręczny
+    </button>
+    <button type="button" [class.active]="view() === 'simulator'" (click)="view.set('simulator')">
+      Symulator
+    </button>
+  </nav>
 
-      <label>
-        Odległość do poprzednika: <strong>{{ distance() }} m</strong>
-        <input
-          type="range"
-          min="0"
-          max="200"
-          step="1"
-          [ngModel]="distance()"
-          (ngModelChange)="distance.set($event)"
-        />
-      </label>
+  @if (view() === 'manual') {
+    <div class="layout">
+      <section class="panel">
+        <h3>Wejście</h3>
 
-      <label>
-        Prędkość względna: <strong>{{ relativeSpeed() }} m/s</strong>
-        <input
-          type="range"
-          min="-30"
-          max="30"
-          step="1"
-          [ngModel]="relativeSpeed()"
-          (ngModelChange)="relativeSpeed.set($event)"
-        />
-      </label>
+        <label>
+          Odległość do poprzednika: <strong>{{ distance() }} m</strong>
+          <input
+            type="range"
+            min="0"
+            max="200"
+            step="1"
+            [ngModel]="distance()"
+            (ngModelChange)="distance.set($event)"
+          />
+        </label>
 
-      <label>
-        Prędkość własna: <strong>{{ ownSpeed() }} km/h</strong>
-        <input
-          type="range"
-          min="0"
-          max="180"
-          step="1"
-          [ngModel]="ownSpeed()"
-          (ngModelChange)="ownSpeed.set($event)"
-        />
-      </label>
+        <label>
+          Prędkość względna: <strong>{{ relativeSpeed() }} m/s</strong>
+          <input
+            type="range"
+            min="-30"
+            max="30"
+            step="1"
+            [ngModel]="relativeSpeed()"
+            (ngModelChange)="relativeSpeed.set($event)"
+          />
+        </label>
 
-      <label>
-        Warunki drogowe: <strong>{{ roadCondition() | number: '1.2-2' }}</strong>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.05"
-          [ngModel]="roadCondition()"
-          (ngModelChange)="roadCondition.set($event)"
-        />
-      </label>
+        <label>
+          Prędkość własna: <strong>{{ ownSpeed() }} km/h</strong>
+          <input
+            type="range"
+            min="0"
+            max="180"
+            step="1"
+            [ngModel]="ownSpeed()"
+            (ngModelChange)="ownSpeed.set($event)"
+          />
+        </label>
 
-      <label>
-        Krzywizna drogi: <strong>{{ curvature() | number: '1.3-3' }} 1/m</strong>
-        <input
-          type="range"
-          min="-0.05"
-          max="0.05"
-          step="0.005"
-          [ngModel]="curvature()"
-          (ngModelChange)="curvature.set($event)"
-        />
-      </label>
+        <label>
+          Warunki drogowe: <strong>{{ roadCondition() | number: '1.2-2' }}</strong>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            [ngModel]="roadCondition()"
+            (ngModelChange)="roadCondition.set($event)"
+          />
+        </label>
 
-      <label>
-        Odchylenie od środka pasa: <strong>{{ lateralOffset() | number: '1.2-2' }} m</strong>
-        <input
-          type="range"
-          min="-2"
-          max="2"
-          step="0.1"
-          [ngModel]="lateralOffset()"
-          (ngModelChange)="lateralOffset.set($event)"
-        />
-      </label>
-      <hr />
-      <button (click)="compute()" [disabled]="loading()">
-        {{ loading() ? 'Obliczanie...' : 'Oblicz' }}
-      </button>
-    </section>
+        <label>
+          Krzywizna drogi: <strong>{{ curvature() | number: '1.3-3' }} 1/m</strong>
+          <input
+            type="range"
+            min="-0.05"
+            max="0.05"
+            step="0.005"
+            [ngModel]="curvature()"
+            (ngModelChange)="curvature.set($event)"
+          />
+        </label>
 
-    @if (error()) {
-      <p class="error">Błąd: {{ error() }}</p>
-    }
-
-    @if (result(); as r) {
-      <section class="results">
-        <h3>Wynik</h3>
-
-        <div class="output">
-          <span class="label">Przyspieszenie / hamowanie</span>
-          <span class="advice" [class]="accelClass(r.acceleration)">
-            {{ accelLabel(r.acceleration) }}
-          </span>
-          <span class="value">{{ r.acceleration | number: '1.2-2' }}</span>
-        </div>
-
-        <div class="output">
-          <span class="label">Korekta toru jazdy</span>
-          <span class="advice" [class]="steerClass(r.steeringCorrection)">
-            {{ steerLabel(r.steeringCorrection) }}
-          </span>
-          <span class="value">{{ r.steeringCorrection | number: '1.2-2' }}</span>
-        </div>
-
-        <div class="output">
-          <span class="label">Sugestia zmiany pasa</span>
-          <span class="advice" [class]="adviceClass(r.laneChangeAdvice)">
-            {{ adviceLabel(r.laneChangeAdvice) }}
-          </span>
-          <span class="value">{{ r.laneChangeUrgency | number: '1.2-2' }}</span>
-        </div>
+        <label>
+          Odchylenie od środka pasa: <strong>{{ lateralOffset() | number: '1.2-2' }} m</strong>
+          <input
+            type="range"
+            min="-2"
+            max="2"
+            step="0.1"
+            [ngModel]="lateralOffset()"
+            (ngModelChange)="lateralOffset.set($event)"
+          />
+        </label>
         <hr />
-        <h3>Aktywowane reguły</h3>
-        @if (r.activatedRules.length === 0) {
-          <p class="empty">Żadna reguła nie została aktywowana.</p>
-        }
-        <ul class="rules">
-          @for (rule of r.activatedRules; track rule.name) {
-            <li>
-              <div class="rule-header">
-                <span class="rule-name">{{ rule.name }}</span>
-                <span class="rule-strength">{{ rule.activation | number: '1.2-2' }}</span>
-              </div>
-              <div class="bar small">
-                <div class="fill" [style.width.%]="rule.activation * 100"></div>
-              </div>
-            </li>
-          }
-        </ul>
+        <button (click)="compute()" [disabled]="loading()">
+          {{ loading() ? 'Obliczanie...' : 'Oblicz' }}
+        </button>
       </section>
-    }
-  </div>
+
+      @if (error()) {
+        <p class="error">Błąd: {{ error() }}</p>
+      }
+
+      @if (result(); as r) {
+        <section class="results">
+          <h3>Wynik</h3>
+
+          <div class="output">
+            <span class="label">Przyspieszenie / hamowanie</span>
+            <span class="advice" [class]="accelClass(r.acceleration)">
+              {{ accelLabel(r.acceleration) }}
+            </span>
+            <span class="value">{{ r.acceleration | number: '1.2-2' }}</span>
+          </div>
+
+          <div class="output">
+            <span class="label">Korekta toru jazdy</span>
+            <span class="advice" [class]="steerClass(r.steeringCorrection)">
+              {{ steerLabel(r.steeringCorrection) }}
+            </span>
+            <span class="value">{{ r.steeringCorrection | number: '1.2-2' }}</span>
+          </div>
+
+          <div class="output">
+            <span class="label">Sugestia zmiany pasa</span>
+            <span class="advice" [class]="adviceClass(r.laneChangeAdvice)">
+              {{ adviceLabel(r.laneChangeAdvice) }}
+            </span>
+            <span class="value">{{ r.laneChangeUrgency | number: '1.2-2' }}</span>
+          </div>
+          <hr />
+          <h3>Aktywowane reguły</h3>
+          @if (r.activatedRules.length === 0) {
+            <p class="empty">Żadna reguła nie została aktywowana.</p>
+          }
+          <ul class="rules">
+            @for (rule of r.activatedRules; track rule.name) {
+              <li>
+                <div class="rule-header">
+                  <span class="rule-name">{{ rule.name }}</span>
+                  <span class="rule-strength">{{ rule.activation | number: '1.2-2' }}</span>
+                </div>
+                <div class="bar small">
+                  <div class="fill" [style.width.%]="rule.activation * 100"></div>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  } @else {
+    <section class="simulator">
+      <div class="sim-controls">
+        <label class="scenario-picker">
+          Scenariusz
+          <select
+            [ngModel]="selectedScenarioId()"
+            (ngModelChange)="selectedScenarioId.set($event)"
+            [disabled]="scenarios().length === 0"
+          >
+            @for (s of scenarios(); track s.id) {
+              <option [value]="s.id">{{ s.label }}</option>
+            }
+          </select>
+        </label>
+        <div>
+          <button (click)="runSelected()" [disabled]="simulating() || !selectedScenarioId()">
+            {{ simulating() ? 'Pobieranie...' : 'Uruchom' }}
+          </button>
+          @if (selectedScenario(); as s) {
+            <span class="scenario-duration">{{ s.defaultDuration | number: '1.0-0' }} s</span>
+          }
+        </div>
+      </div>
+
+      @if (selectedScenario(); as s) {
+        <p class="scenario-description">{{ s.description }}</p>
+      }
+
+      @if (simError()) {
+        <p class="error">Błąd: {{ simError() }}</p>
+      }
+
+      <app-road-canvas [snapshots]="snapshots()" />
+      <app-telemetry-chart [snapshots]="snapshots()" />
+    </section>
+  }
 </main>

@@ -1,7 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { DecimalPipe } from '@angular/common';
+import { RoadCanvasComponent } from './simulator/road-canvas.component';
+import { TelemetryChartComponent } from './simulator/telemetry-chart.component';
+import { ScenarioDescriptor, SimulationSnapshot } from './shared/simulation.types';
 
 interface RuleActivation {
   name: string;
@@ -17,14 +20,18 @@ interface ControlResponse {
   fuzzifiedInputs: Record<string, Record<string, number>>;
 }
 
+type View = 'manual' | 'simulator';
+
 @Component({
   selector: 'app-root',
-  imports: [FormsModule, DecimalPipe],
+  imports: [FormsModule, DecimalPipe, RoadCanvasComponent, TelemetryChartComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
   private http = inject(HttpClient);
+
+  view = signal<View>('manual');
 
   distance = signal(80);
   relativeSpeed = signal(0);
@@ -36,6 +43,32 @@ export class App {
   result = signal<ControlResponse | null>(null);
   error = signal<string | null>(null);
   loading = signal(false);
+
+  scenarios = signal<ScenarioDescriptor[]>([]);
+  selectedScenarioId = signal<string>('');
+  selectedScenario = computed<ScenarioDescriptor | null>(() => {
+    const id = this.selectedScenarioId();
+    return this.scenarios().find(s => s.id === id) ?? null;
+  });
+
+  snapshots = signal<SimulationSnapshot[]>([]);
+  simulating = signal(false);
+  simError = signal<string | null>(null);
+
+  constructor() {
+    this.http.get<ScenarioDescriptor[]>('http://localhost:8080/api/scenarios').subscribe({
+      next: (list) => {
+        this.scenarios.set(list);
+        if (list.length > 0) this.selectedScenarioId.set(list[0].id);
+      },
+      error: (err) => this.simError.set(err.message ?? 'Nie udało się pobrać scenariuszy'),
+    });
+  }
+
+  runSelected() {
+    const id = this.selectedScenarioId();
+    if (id) this.runScenario(id);
+  }
 
   compute() {
     this.loading.set(true);
@@ -50,6 +83,18 @@ export class App {
     }).subscribe({
       next: (res) => { this.result.set(res); this.loading.set(false); },
       error: (err) => { this.error.set(err.message ?? 'Żądanie nie powiodło się'); this.loading.set(false); },
+    });
+  }
+
+  runScenario(id: string) {
+    this.simulating.set(true);
+    this.simError.set(null);
+    this.snapshots.set([]);
+    this.http.post<SimulationSnapshot[]>('http://localhost:8080/api/simulation/run', {
+      scenario: id,
+    }).subscribe({
+      next: (res) => { this.snapshots.set(res); this.simulating.set(false); },
+      error: (err) => { this.simError.set(err.message ?? 'Symulacja nie powiodła się'); this.simulating.set(false); },
     });
   }
 

@@ -191,3 +191,82 @@ button:disabled {
   margin-top: 1rem;
   color: #b91c1c;
 }
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tabs button {
+  background: transparent;
+  color: #374151;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+.simulator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sim-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.sim-controls button {
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+.sim-controls .hint {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.scenario-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.scenario-picker select {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  min-width: 220px;
+}
+
+.scenario-duration {
+  margin: 0 0 0 0.45rem;
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.scenario-description {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.9rem;
+  font-style: italic;
+}
