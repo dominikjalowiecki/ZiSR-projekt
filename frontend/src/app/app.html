@@ -177,8 +177,71 @@
         <p class="error">Błąd: {{ simError() }}</p>
       }
 
-      <app-road-canvas [snapshots]="snapshots()" />
-      <app-telemetry-chart [snapshots]="snapshots()" />
+      <div class="sim-body">
+        <div class="sim-viz">
+          <app-road-canvas [snapshots]="snapshots()" (frameIndex)="selectedStep.set($event)" />
+          <app-telemetry-chart [snapshots]="snapshots()" />
+        </div>
+
+      @if (selectedSnapshot(); as snap) {
+        <section class="results sim-rules">
+          <h3>Aktywowane reguły w wybranej chwili</h3>
+
+          <label class="step-picker">
+            Chwila symulacji: <strong>t = {{ snap.time | number: '1.1-1' }} s</strong>
+            <input
+              type="range"
+              min="0"
+              [max]="snapshots().length - 1"
+              step="1"
+              [ngModel]="selectedStep()"
+              (ngModelChange)="selectedStep.set($event)"
+            />
+          </label>
+
+          <div class="output">
+            <span class="label">Przyspieszenie / hamowanie</span>
+            <span class="advice" [class]="accelClass(snap.acceleration)">
+              {{ accelLabel(snap.acceleration) }}
+            </span>
+            <span class="value">{{ snap.acceleration | number: '1.2-2' }}</span>
+          </div>
+
+          <div class="output">
+            <span class="label">Korekta toru jazdy</span>
+            <span class="advice" [class]="steerClass(snap.steeringCorrection)">
+              {{ steerLabel(snap.steeringCorrection) }}
+            </span>
+            <span class="value">{{ snap.steeringCorrection | number: '1.2-2' }}</span>
+          </div>
+
+          <div class="output">
+            <span class="label">Sugestia zmiany pasa</span>
+            <span class="advice" [class]="adviceClass(snap.laneChangeAdvice)">
+              {{ adviceLabel(snap.laneChangeAdvice) }}
+            </span>
+            <span class="value">{{ snap.laneChangeUrgency | number: '1.2-2' }}</span>
+          </div>
+          <hr />
+          @if (snap.activatedRules.length === 0) {
+            <p class="empty">Żadna reguła nie została aktywowana.</p>
+          }
+          <ul class="rules">
+            @for (rule of snap.activatedRules; track rule.name) {
+              <li>
+                <div class="rule-header">
+                  <span class="rule-name">{{ rule.name }}</span>
+                  <span class="rule-strength">{{ rule.activation | number: '1.2-2' }}</span>
+                </div>
+                <div class="bar small">
+                  <div class="fill" [style.width.%]="rule.activation * 100"></div>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+      </div>
     </section>
   }
 </main>

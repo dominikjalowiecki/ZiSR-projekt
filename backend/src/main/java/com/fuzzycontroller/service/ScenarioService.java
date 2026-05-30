@@ -24,6 +24,8 @@ public class ScenarioService {
         scenarios.put("stop-and-go",    buildStopAndGo());
         scenarios.put("mountain-road",  buildMountainRoad());
         scenarios.put("lane-drift",     buildLaneDrift());
+        scenarios.put("overtake-slow",  buildOvertakeSlow());
+        scenarios.put("patient-overtake", buildPatientOvertake());
     }
 
     public List<ScenarioDescriptor> list() {
@@ -244,6 +246,45 @@ public class ScenarioService {
             initial,
             env0,
             (t, own) -> new Environment(leadStart + leadSpeed * t, leadSpeed, 0.0, 0.95)
+        );
+    }
+
+    private Scenario buildOvertakeSlow() {
+        double ownSpeed  = 110 * KMH_TO_MS;
+        double leadSpeed = 50 * KMH_TO_MS;
+        double leadStart = 35.0;
+
+        VehicleState initial = new VehicleState(0.0, 0.0, ownSpeed, 0.0, 0.0);
+        Environment env0 = new Environment(leadStart, leadSpeed, 0.0, 0.95, false);
+
+        return new Scenario(
+            "overtake-slow",
+            "Wyprzedzanie wolniejszego auta",
+            "Jedziemy 110 km/h, auto z przodu jedzie 50 km/h. Lewy pas wolny.",
+            12.0,
+            initial,
+            env0,
+            (t, own) -> new Environment(leadStart + leadSpeed * t, leadSpeed, 0.0, 0.95, false)
+        );
+    }
+
+    private Scenario buildPatientOvertake() {
+        double ownSpeed  = 110 * KMH_TO_MS;
+        double leadSpeed = 50 * KMH_TO_MS;
+        double leadStart = 35.0;
+        double laneClearsAt = 2.0;
+
+        VehicleState initial = new VehicleState(0.0, 0.0, ownSpeed, 0.0, 0.0);
+        Environment env0 = new Environment(leadStart, leadSpeed, 0.0, 0.95, true);
+
+        return new Scenario(
+            "patient-overtake",
+            "Cierpliwe wyprzedzanie",
+            "Wolne auto z przodu, lewy pas początkowo zajęty. Po 2 s lewy pas się zwalnia.",
+            12.0,
+            initial,
+            env0,
+            (t, own) -> new Environment(leadStart + leadSpeed * t, leadSpeed, 0.0, 0.95, t < laneClearsAt)
         );
     }
 

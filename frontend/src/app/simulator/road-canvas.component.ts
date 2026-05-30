@@ -6,6 +6,7 @@ import {
   computed,
   effect,
   input,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -113,6 +114,7 @@ const FRAME_DT_SEC = 0.1;
 })
 export class RoadCanvasComponent implements OnDestroy, AfterViewInit {
   readonly snapshots = input<SimulationSnapshot[]>([]);
+  readonly frameIndex = output<number>();
 
   protected readonly canvasWidth = CANVAS_WIDTH;
   protected readonly canvasHeight = CANVAS_HEIGHT;
@@ -125,6 +127,7 @@ export class RoadCanvasComponent implements OnDestroy, AfterViewInit {
   private playbackStartMs = 0;
   private viewReady = false;
   private smoothedLeadX: number | null = null;
+  private lastEmittedIdx = -1;
 
   constructor() {
     effect(() => {
@@ -154,6 +157,7 @@ export class RoadCanvasComponent implements OnDestroy, AfterViewInit {
     this.cancelFrame();
     this.playbackStartMs = performance.now();
     this.smoothedLeadX = null;
+    this.lastEmittedIdx = -1;
 
     const tick = () => {
       const elapsedSec = (performance.now() - this.playbackStartMs) / 1000;
@@ -161,6 +165,11 @@ export class RoadCanvasComponent implements OnDestroy, AfterViewInit {
       const snap = snaps[idx];
       this.current.set(snap);
       this.drawFrame(snap);
+
+      if (idx !== this.lastEmittedIdx) {
+        this.lastEmittedIdx = idx;
+        this.frameIndex.emit(idx);
+      }
 
       if (idx < snaps.length - 1) {
         this.animationFrameId = requestAnimationFrame(tick);

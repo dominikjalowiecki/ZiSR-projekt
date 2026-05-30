@@ -82,7 +82,8 @@ public class SimulationService {
                 control.steeringCorrection(),
                 control.laneChangeUrgency(),
                 control.laneChangeAdvice(),
-                env.leftLaneBlocked()
+                env.leftLaneBlocked(),
+                control.activatedRules()
             ));
 
             own = integrate(own, env, control, t);

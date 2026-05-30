@@ -1,3 +1,8 @@
+export interface RuleActivation {
+  name: string;
+  activation: number;
+}
+
 export interface SimulationSnapshot {
   time: number;
   ownPosition: number;
@@ -15,6 +20,7 @@ export interface SimulationSnapshot {
   laneChangeUrgency: number;
   laneChangeAdvice: string;
   leftLaneBlocked: boolean;
+  activatedRules: RuleActivation[];
 }
 
 export interface ScenarioDescriptor {

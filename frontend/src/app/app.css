@@ -222,6 +222,38 @@ button:disabled {
   gap: 0.75rem;
 }
 
+.sim-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.sim-viz {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sim-rules {
+  flex: 1 1 300px;
+  min-width: 280px;
+  box-sizing: border-box;
+}
+
+.step-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.step-picker input[type='range'] {
+  width: 100%;
+}
+
 .sim-controls {
   display: flex;
   flex-wrap: wrap;

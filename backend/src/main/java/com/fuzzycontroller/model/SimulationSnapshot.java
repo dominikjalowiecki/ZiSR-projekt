@@ -1,5 +1,7 @@
 package com.fuzzycontroller.model;
 
+import java.util.List;
+
 public record SimulationSnapshot(
     double time,
     double ownPosition,
@@ -16,6 +18,7 @@ public record SimulationSnapshot(
     double steeringCorrection,
     double laneChangeUrgency,
     String laneChangeAdvice,
-    boolean leftLaneBlocked
+    boolean leftLaneBlocked,
+    List<RuleActivation> activatedRules
 ) {
 }

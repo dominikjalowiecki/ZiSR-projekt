@@ -4,12 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { DecimalPipe } from '@angular/common';
 import { RoadCanvasComponent } from './simulator/road-canvas.component';
 import { TelemetryChartComponent } from './simulator/telemetry-chart.component';
-import { ScenarioDescriptor, SimulationSnapshot } from './shared/simulation.types';
-
-interface RuleActivation {
-  name: string;
-  activation: number;
-}
+import { RuleActivation, ScenarioDescriptor, SimulationSnapshot } from './shared/simulation.types';
 
 interface ControlResponse {
   acceleration: number;
@@ -55,6 +50,14 @@ export class App {
   simulating = signal(false);
   simError = signal<string | null>(null);
 
+  selectedStep = signal(0);
+  selectedSnapshot = computed<SimulationSnapshot | null>(() => {
+    const snaps = this.snapshots();
+    if (snaps.length === 0) return null;
+    const idx = Math.min(Math.max(this.selectedStep(), 0), snaps.length - 1);
+    return snaps[idx];
+  });
+
   constructor() {
     this.http.get<ScenarioDescriptor[]>('http://localhost:8080/api/scenarios').subscribe({
       next: (list) => {
@@ -90,6 +93,7 @@ export class App {
     this.simulating.set(true);
     this.simError.set(null);
     this.snapshots.set([]);
+    this.selectedStep.set(0);
     this.http.post<SimulationSnapshot[]>('http://localhost:8080/api/simulation/run', {
       scenario: id,
     }).subscribe({
