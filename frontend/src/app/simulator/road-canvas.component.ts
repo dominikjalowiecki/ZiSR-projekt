@@ -2,11 +2,9 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  OnDestroy,
   computed,
   effect,
   input,
-  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -23,7 +21,6 @@ const ROAD_BOTTOM = 220;
 const LANE_DIVIDER_Y = 150;
 const RIGHT_LANE_CENTER = 185;
 const LEFT_LANE_CENTER = 115;
-const FRAME_DT_SEC = 0.1;
 
 @Component({
   selector: 'app-road-canvas',
@@ -112,9 +109,9 @@ const FRAME_DT_SEC = 0.1;
     }
   `],
 })
-export class RoadCanvasComponent implements OnDestroy, AfterViewInit {
+export class RoadCanvasComponent implements AfterViewInit {
   readonly snapshots = input<SimulationSnapshot[]>([]);
-  readonly frameIndex = output<number>();
+  readonly frameIndex = input<number>(0);
 
   protected readonly canvasWidth = CANVAS_WIDTH;
   protected readonly canvasHeight = CANVAS_HEIGHT;
@@ -123,69 +120,33 @@ export class RoadCanvasComponent implements OnDestroy, AfterViewInit {
 
   private canvasRef = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
   private ctx: CanvasRenderingContext2D | null = null;
-  private animationFrameId: number | null = null;
-  private playbackStartMs = 0;
   private viewReady = false;
-  private smoothedLeadX: number | null = null;
-  private lastEmittedIdx = -1;
 
   constructor() {
     effect(() => {
       const snaps = this.snapshots();
-      if (this.viewReady && snaps.length > 0) {
-        this.startPlayback(snaps);
-      }
+      const idx = this.frameIndex();
+      if (!this.viewReady) return;
+      this.render(snaps, idx);
     });
   }
 
   ngAfterViewInit(): void {
     this.ctx = this.canvasRef().nativeElement.getContext('2d');
     this.viewReady = true;
-    this.drawEmpty();
+    this.render(this.snapshots(), this.frameIndex());
+  }
 
-    const snaps = this.snapshots();
-    if (snaps.length > 0) {
-      this.startPlayback(snaps);
+  private render(snaps: SimulationSnapshot[], idx: number): void {
+    if (snaps.length === 0) {
+      this.current.set(null);
+      this.drawEmpty();
+      return;
     }
-  }
-
-  ngOnDestroy(): void {
-    this.cancelFrame();
-  }
-
-  private startPlayback(snaps: SimulationSnapshot[]): void {
-    this.cancelFrame();
-    this.playbackStartMs = performance.now();
-    this.smoothedLeadX = null;
-    this.lastEmittedIdx = -1;
-
-    const tick = () => {
-      const elapsedSec = (performance.now() - this.playbackStartMs) / 1000;
-      const idx = Math.min(snaps.length - 1, Math.floor(elapsedSec / FRAME_DT_SEC));
-      const snap = snaps[idx];
-      this.current.set(snap);
-      this.drawFrame(snap);
-
-      if (idx !== this.lastEmittedIdx) {
-        this.lastEmittedIdx = idx;
-        this.frameIndex.emit(idx);
-      }
-
-      if (idx < snaps.length - 1) {
-        this.animationFrameId = requestAnimationFrame(tick);
-      } else {
-        this.animationFrameId = null;
-      }
-    };
-
-    tick();
-  }
-
-  private cancelFrame(): void {
-    if (this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
-    }
+    const clamped = Math.min(Math.max(idx, 0), snaps.length - 1);
+    const snap = snaps[clamped];
+    this.current.set(snap);
+    this.drawFrame(snap);
   }
 
   private drawEmpty(): void {
@@ -202,15 +163,7 @@ export class RoadCanvasComponent implements OnDestroy, AfterViewInit {
     this.drawRoad(ctx);
     this.drawLaneStripes(ctx, snap.ownPosition);
 
-    const targetLeadX = OWN_X + (snap.leadPosition - snap.ownPosition) * PX_PER_METER;
-    if (this.smoothedLeadX === null) {
-      this.smoothedLeadX = targetLeadX;
-    } else if (targetLeadX < this.smoothedLeadX - 150 && this.smoothedLeadX > CANVAS_WIDTH) {
-      this.smoothedLeadX = CANVAS_WIDTH + 30;
-    }
-    this.smoothedLeadX += (targetLeadX - this.smoothedLeadX) * 0.2;
-    const leadX = this.smoothedLeadX;
-
+    const leadX = OWN_X + (snap.leadPosition - snap.ownPosition) * PX_PER_METER;
     if (leadX > -30 && leadX < CANVAS_WIDTH + 30) {
       this.drawCar(ctx, leadX, RIGHT_LANE_CENTER, '#dc2626', 'PRZÓD');
     } else if (leadX >= CANVAS_WIDTH + 30) {

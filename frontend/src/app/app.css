@@ -241,17 +241,25 @@ button:disabled {
   box-sizing: border-box;
 }
 
-.step-picker {
+.sim-transport {
   display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  margin-bottom: 0.75rem;
-  font-size: 0.85rem;
-  color: #6b7280;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
 }
 
-.step-picker input[type='range'] {
-  width: 100%;
+.transport-slider {
+  flex: 1 1 160px;
+  min-width: 140px;
+}
+
+.transport-time {
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  color: #6b7280;
+  min-width: 2.5rem;
+  text-align: right;
 }
 
 .sim-controls {

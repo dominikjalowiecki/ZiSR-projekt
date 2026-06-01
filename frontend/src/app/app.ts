@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { DecimalPipe } from '@angular/common';
@@ -23,8 +23,12 @@ type View = 'manual' | 'simulator';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
+export class App implements OnDestroy {
   private http = inject(HttpClient);
+
+  private static readonly FRAME_INTERVAL_MS = 100;
+  private playbackTimer: ReturnType<typeof setInterval> | null = null;
+  playing = signal(false);
 
   view = signal<View>('manual');
 
@@ -73,6 +77,54 @@ export class App {
     if (id) this.runScenario(id);
   }
 
+  togglePlay() {
+    if (this.playing()) this.pause();
+    else this.play();
+  }
+
+  play() {
+    const snaps = this.snapshots();
+    if (snaps.length === 0) return;
+
+    if (this.selectedStep() >= snaps.length - 1) {
+      this.selectedStep.set(0);
+    }
+
+    this.clearTimer();
+    this.playing.set(true);
+    this.playbackTimer = setInterval(() => {
+      const last = this.snapshots().length - 1;
+      const next = this.selectedStep() + 1;
+      if (next >= last) {
+        this.selectedStep.set(last);
+        this.pause();
+      } else {
+        this.selectedStep.set(next);
+      }
+    }, App.FRAME_INTERVAL_MS);
+  }
+
+  pause() {
+    this.clearTimer();
+    this.playing.set(false);
+  }
+
+  seek(step: number) {
+    this.pause();
+    this.selectedStep.set(step);
+  }
+
+  private clearTimer() {
+    if (this.playbackTimer !== null) {
+      clearInterval(this.playbackTimer);
+      this.playbackTimer = null;
+    }
+  }
+
+  ngOnDestroy() {
+    this.clearTimer();
+  }
+
   compute() {
     this.loading.set(true);
     this.error.set(null);
@@ -90,6 +142,7 @@ export class App {
   }
 
   runScenario(id: string) {
+    this.pause();
     this.simulating.set(true);
     this.simError.set(null);
     this.snapshots.set([]);
@@ -97,7 +150,7 @@ export class App {
     this.http.post<SimulationSnapshot[]>('http://localhost:8080/api/simulation/run', {
       scenario: id,
     }).subscribe({
-      next: (res) => { this.snapshots.set(res); this.simulating.set(false); },
+      next: (res) => { this.snapshots.set(res); this.simulating.set(false); this.play(); },
       error: (err) => { this.simError.set(err.message ?? 'Symulacja nie powiodła się'); this.simulating.set(false); },
     });
   }

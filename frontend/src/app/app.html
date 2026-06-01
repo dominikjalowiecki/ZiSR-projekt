@@ -179,68 +179,76 @@
 
       <div class="sim-body">
         <div class="sim-viz">
-          <app-road-canvas [snapshots]="snapshots()" (frameIndex)="selectedStep.set($event)" />
+          <app-road-canvas [snapshots]="snapshots()" [frameIndex]="selectedStep()" />
           <app-telemetry-chart [snapshots]="snapshots()" />
         </div>
 
-      @if (selectedSnapshot(); as snap) {
-        <section class="results sim-rules">
-          <h3>Aktywowane reguły w wybranej chwili</h3>
+        @if (selectedSnapshot(); as snap) {
+          <section class="results sim-rules">
+            <div class="sim-transport">
+              <button type="button" (click)="togglePlay()" [disabled]="snapshots().length === 0">
+                {{ playing() ? 'Stop' : 'Start' }}
+              </button>
+              <button type="button" (click)="seek(0)" [disabled]="snapshots().length === 0">
+                Reset
+              </button>
+              <input
+                class="transport-slider"
+                type="range"
+                min="0"
+                [max]="snapshots().length - 1"
+                step="1"
+                [ngModel]="selectedStep()"
+                (ngModelChange)="seek($event)"
+                [disabled]="snapshots().length === 0"
+              />
+              <span class="transport-time">{{ snap.time | number: '1.1-1' }} s</span>
+            </div>
 
-          <label class="step-picker">
-            Chwila symulacji: <strong>t = {{ snap.time | number: '1.1-1' }} s</strong>
-            <input
-              type="range"
-              min="0"
-              [max]="snapshots().length - 1"
-              step="1"
-              [ngModel]="selectedStep()"
-              (ngModelChange)="selectedStep.set($event)"
-            />
-          </label>
+            <h3>Aktywowane reguły</h3>
 
-          <div class="output">
-            <span class="label">Przyspieszenie / hamowanie</span>
-            <span class="advice" [class]="accelClass(snap.acceleration)">
-              {{ accelLabel(snap.acceleration) }}
-            </span>
-            <span class="value">{{ snap.acceleration | number: '1.2-2' }}</span>
-          </div>
+            <div class="output">
+              <span class="label">Przyspieszenie / hamowanie</span>
+              <span class="advice" [class]="accelClass(snap.acceleration)">
+                {{ accelLabel(snap.acceleration) }}
+              </span>
+              <span class="value">{{ snap.acceleration | number: '1.2-2' }}</span>
+            </div>
 
-          <div class="output">
-            <span class="label">Korekta toru jazdy</span>
-            <span class="advice" [class]="steerClass(snap.steeringCorrection)">
-              {{ steerLabel(snap.steeringCorrection) }}
-            </span>
-            <span class="value">{{ snap.steeringCorrection | number: '1.2-2' }}</span>
-          </div>
+            <div class="output">
+              <span class="label">Korekta toru jazdy</span>
+              <span class="advice" [class]="steerClass(snap.steeringCorrection)">
+                {{ steerLabel(snap.steeringCorrection) }}
+              </span>
+              <span class="value">{{ snap.steeringCorrection | number: '1.2-2' }}</span>
+            </div>
 
-          <div class="output">
-            <span class="label">Sugestia zmiany pasa</span>
-            <span class="advice" [class]="adviceClass(snap.laneChangeAdvice)">
-              {{ adviceLabel(snap.laneChangeAdvice) }}
-            </span>
-            <span class="value">{{ snap.laneChangeUrgency | number: '1.2-2' }}</span>
-          </div>
-          <hr />
-          @if (snap.activatedRules.length === 0) {
-            <p class="empty">Żadna reguła nie została aktywowana.</p>
-          }
-          <ul class="rules">
-            @for (rule of snap.activatedRules; track rule.name) {
-              <li>
-                <div class="rule-header">
-                  <span class="rule-name">{{ rule.name }}</span>
-                  <span class="rule-strength">{{ rule.activation | number: '1.2-2' }}</span>
-                </div>
-                <div class="bar small">
-                  <div class="fill" [style.width.%]="rule.activation * 100"></div>
-                </div>
-              </li>
+            <div class="output">
+              <span class="label">Sugestia zmiany pasa</span>
+              <span class="advice" [class]="adviceClass(snap.laneChangeAdvice)">
+                {{ adviceLabel(snap.laneChangeAdvice) }}
+              </span>
+              <span class="value">{{ snap.laneChangeUrgency | number: '1.2-2' }}</span>
+            </div>
+            <hr />
+            @if (snap.activatedRules.length === 0) {
+              <p class="empty">Żadna reguła nie została aktywowana.</p>
             }
-          </ul>
-        </section>
-      }
+            <ul class="rules">
+              @for (rule of snap.activatedRules; track rule.name) {
+                <li>
+                  <div class="rule-header">
+                    <span class="rule-name">{{ rule.name }}</span>
+                    <span class="rule-strength">{{ rule.activation | number: '1.2-2' }}</span>
+                  </div>
+                  <div class="bar small">
+                    <div class="fill" [style.width.%]="rule.activation * 100"></div>
+                  </div>
+                </li>
+              }
+            </ul>
+          </section>
+        }
       </div>
     </section>
   }
