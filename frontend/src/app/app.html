@@ -98,49 +98,7 @@
 
       @if (result(); as r) {
         <section class="results">
-          <h3>Wynik</h3>
-
-          <div class="output">
-            <span class="label">Przyspieszenie / hamowanie</span>
-            <span class="advice" [class]="accelClass(r.acceleration)">
-              {{ accelLabel(r.acceleration) }}
-            </span>
-            <span class="value">{{ r.acceleration | number: '1.2-2' }}</span>
-          </div>
-
-          <div class="output">
-            <span class="label">Korekta toru jazdy</span>
-            <span class="advice" [class]="steerClass(r.steeringCorrection)">
-              {{ steerLabel(r.steeringCorrection) }}
-            </span>
-            <span class="value">{{ r.steeringCorrection | number: '1.2-2' }}</span>
-          </div>
-
-          <div class="output">
-            <span class="label">Sugestia zmiany pasa</span>
-            <span class="advice" [class]="adviceClass(r.laneChangeAdvice)">
-              {{ adviceLabel(r.laneChangeAdvice) }}
-            </span>
-            <span class="value">{{ r.laneChangeUrgency | number: '1.2-2' }}</span>
-          </div>
-          <hr />
-          <h3>Aktywowane reguły</h3>
-          @if (r.activatedRules.length === 0) {
-            <p class="empty">Żadna reguła nie została aktywowana.</p>
-          }
-          <ul class="rules">
-            @for (rule of r.activatedRules; track rule.name) {
-              <li>
-                <div class="rule-header">
-                  <span class="rule-name">{{ rule.name }}</span>
-                  <span class="rule-strength">{{ rule.activation | number: '1.2-2' }}</span>
-                </div>
-                <div class="bar small">
-                  <div class="fill" [style.width.%]="rule.activation * 100"></div>
-                </div>
-              </li>
-            }
-          </ul>
+          <app-rule-results [result]="r" />
         </section>
       }
     </div>
@@ -205,48 +163,7 @@
               <span class="transport-time">{{ snap.time | number: '1.1-1' }} s</span>
             </div>
 
-            <h3>Aktywowane reguły</h3>
-
-            <div class="output">
-              <span class="label">Przyspieszenie / hamowanie</span>
-              <span class="advice" [class]="accelClass(snap.acceleration)">
-                {{ accelLabel(snap.acceleration) }}
-              </span>
-              <span class="value">{{ snap.acceleration | number: '1.2-2' }}</span>
-            </div>
-
-            <div class="output">
-              <span class="label">Korekta toru jazdy</span>
-              <span class="advice" [class]="steerClass(snap.steeringCorrection)">
-                {{ steerLabel(snap.steeringCorrection) }}
-              </span>
-              <span class="value">{{ snap.steeringCorrection | number: '1.2-2' }}</span>
-            </div>
-
-            <div class="output">
-              <span class="label">Sugestia zmiany pasa</span>
-              <span class="advice" [class]="adviceClass(snap.laneChangeAdvice)">
-                {{ adviceLabel(snap.laneChangeAdvice) }}
-              </span>
-              <span class="value">{{ snap.laneChangeUrgency | number: '1.2-2' }}</span>
-            </div>
-            <hr />
-            @if (snap.activatedRules.length === 0) {
-              <p class="empty">Żadna reguła nie została aktywowana.</p>
-            }
-            <ul class="rules">
-              @for (rule of snap.activatedRules; track rule.name) {
-                <li>
-                  <div class="rule-header">
-                    <span class="rule-name">{{ rule.name }}</span>
-                    <span class="rule-strength">{{ rule.activation | number: '1.2-2' }}</span>
-                  </div>
-                  <div class="bar small">
-                    <div class="fill" [style.width.%]="rule.activation * 100"></div>
-                  </div>
-                </li>
-              }
-            </ul>
+            <app-rule-results [result]="snap" />
           </section>
         }
       </div>

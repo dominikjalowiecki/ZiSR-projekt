@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { DecimalPipe } from '@angular/common';
 import { RoadCanvasComponent } from './simulator/road-canvas.component';
 import { TelemetryChartComponent } from './simulator/telemetry-chart.component';
+import { RuleResultsComponent } from './shared/rule-results.component';
 import { RuleActivation, ScenarioDescriptor, SimulationSnapshot } from './shared/simulation.types';
 
 interface ControlResponse {
@@ -19,7 +20,7 @@ type View = 'manual' | 'simulator';
 
 @Component({
   selector: 'app-root',
-  imports: [FormsModule, DecimalPipe, RoadCanvasComponent, TelemetryChartComponent],
+  imports: [FormsModule, DecimalPipe, RoadCanvasComponent, TelemetryChartComponent, RuleResultsComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -153,50 +154,5 @@ export class App implements OnDestroy {
       next: (res) => { this.snapshots.set(res); this.simulating.set(false); this.play(); },
       error: (err) => { this.simError.set(err.message ?? 'Symulacja nie powiodła się'); this.simulating.set(false); },
     });
-  }
-
-  accelLabel(v: number): string {
-    if (v <= -0.5) return 'Mocne hamowanie';
-    if (v <= -0.1) return 'Lekkie hamowanie';
-    if (v <  0.1) return 'Utrzymaj prędkość';
-    if (v <  0.5) return 'Lekkie przyspieszenie';
-    return 'Mocne przyspieszenie';
-  }
-
-  accelClass(v: number): string {
-    if (v <= -0.5) return 'advice-danger';
-    if (v <= -0.1) return 'advice-warning';
-    if (v <  0.1) return 'advice-ok';
-    if (v <  0.5) return 'advice-warning';
-    return 'advice-danger';
-  }
-
-  steerLabel(v: number): string {
-    if (v <= -0.5) return 'Mocno w lewo';
-    if (v <= -0.1) return 'Lekko w lewo';
-    if (v <  0.1) return 'Prosto';
-    if (v <  0.5) return 'Lekko w prawo';
-    return 'Mocno w prawo';
-  }
-
-  steerClass(v: number): string {
-    if (Math.abs(v) >= 0.5) return 'advice-danger';
-    if (Math.abs(v) >= 0.1) return 'advice-warning';
-    return 'advice-ok';
-  }
-
-  adviceClass(advice: string): string {
-    if (advice === 'CHANGE_NOW') return 'advice-danger';
-    if (advice === 'PREPARE') return 'advice-warning';
-    return 'advice-ok';
-  }
-
-  adviceLabel(advice: string): string {
-    switch (advice) {
-      case 'KEEP': return 'Utrzymaj pas';
-      case 'PREPARE': return 'Przygotuj zmianę';
-      case 'CHANGE_NOW': return 'Zmień pas teraz';
-      default: return advice;
-    }
   }
 }

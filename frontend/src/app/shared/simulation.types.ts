@@ -3,6 +3,14 @@ export interface RuleActivation {
   activation: number;
 }
 
+export interface RuleResult {
+  acceleration: number;
+  steeringCorrection: number;
+  laneChangeUrgency: number;
+  laneChangeAdvice: string;
+  activatedRules: RuleActivation[];
+}
+
 export interface SimulationSnapshot {
   time: number;
   ownPosition: number;
