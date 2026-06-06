@@ -23,6 +23,7 @@ public class SimulationService {
     private static final double LANE_CHANGE_RATE = 0.05;
     private static final double CLEAR_ROAD_DISTANCE = 200.0;
     private static final double CURVE_OFFSET_GAIN = 20.0;
+    private static final double RETURN_CLEARANCE = 15.0;
 
     private final ScenarioService scenarioService;
     private final FuzzyEngineService fuzzyEngine;
@@ -49,12 +50,9 @@ public class SimulationService {
             double rawDistance = env.leadPosition() - own.position();
             double rawRelativeSpeed = env.leadSpeed() - own.speed();
 
-            double effectiveDistance = own.lane() > 0.5
-                ? CLEAR_ROAD_DISTANCE
-                : rawDistance;
-            double effectiveRelativeSpeed = own.lane() > 0.5
-                ? 0.0
-                : rawRelativeSpeed;
+            boolean clearRoad = own.lane() > 0.5 || rawDistance < 0.0;
+            double effectiveDistance = clearRoad ? CLEAR_ROAD_DISTANCE : rawDistance;
+            double effectiveRelativeSpeed = clearRoad ? 0.0 : rawRelativeSpeed;
 
             ControlRequest req = new ControlRequest(
                 effectiveDistance,
@@ -103,14 +101,25 @@ public class SimulationService {
         if (newOffset >  LATERAL_LIMIT) newOffset =  LATERAL_LIMIT;
         if (newOffset < -LATERAL_LIMIT) newOffset = -LATERAL_LIMIT;
 
-        double newLane = own.lane();
-        boolean midChange    = own.lane() > 0.01 && own.lane() < 0.99;
-        boolean shouldChange = own.lane() < 0.99
-            && control.laneChangeUrgency() > LANE_CHANGE_TRIGGER
-            && !env.leftLaneBlocked();
+        double leadGap = env.leadPosition() - own.position();
+        boolean overtakeDone = leadGap < -RETURN_CLEARANCE;
 
-        if (shouldChange || midChange) {
-            newLane = Math.min(1.0, own.lane() + LANE_CHANGE_RATE);
+        double targetLane;
+        if (overtakeDone) {
+            targetLane = 0.0;
+        } else if (own.lane() > 0.01) {
+            targetLane = 1.0;
+        } else if (control.laneChangeUrgency() > LANE_CHANGE_TRIGGER && !env.leftLaneBlocked()) {
+            targetLane = 1.0;
+        } else {
+            targetLane = 0.0;
+        }
+
+        double newLane = own.lane();
+        if (newLane < targetLane) {
+            newLane = Math.min(targetLane, newLane + LANE_CHANGE_RATE);
+        } else if (newLane > targetLane) {
+            newLane = Math.max(targetLane, newLane - LANE_CHANGE_RATE);
         }
 
         return new VehicleState(t + DT, newPosition, newSpeed, newOffset, newLane);
