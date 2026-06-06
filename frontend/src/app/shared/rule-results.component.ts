@@ -1,6 +1,18 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { RuleResult } from './simulation.types';
+import { RuleActivation, RuleResult } from './simulation.types';
+
+interface RuleGroup {
+  outputVar: string;
+  label: string;
+  rules: RuleActivation[];
+}
+
+const RULE_GROUP_ORDER: ReadonlyArray<{ outputVar: string; label: string }> = [
+  { outputVar: 'acceleration', label: 'Przyspieszenie / hamowanie' },
+  { outputVar: 'steeringCorrection', label: 'Korekta toru jazdy' },
+  { outputVar: 'laneChangeUrgency', label: 'Zmiana pasa' },
+];
 
 @Component({
   selector: 'app-rule-results',
@@ -38,19 +50,24 @@ import { RuleResult } from './simulation.types';
     @if (result().activatedRules.length === 0) {
       <p class="empty">Żadna reguła nie została aktywowana.</p>
     }
-    <ul class="rules">
-      @for (rule of result().activatedRules; track rule.name) {
-        <li>
-          <div class="rule-header">
-            <span class="rule-name">{{ rule.name }}</span>
-            <span class="rule-strength">{{ rule.activation | number: '1.2-2' }}</span>
-          </div>
-          <div class="bar small">
-            <div class="fill" [style.width.%]="rule.activation * 100"></div>
-          </div>
-        </li>
-      }
-    </ul>
+    @for (group of ruleGroups(); track group.outputVar) {
+      <div class="rule-group">
+        <h4 class="group-title">{{ group.label }}</h4>
+        <ul class="rules">
+          @for (rule of group.rules; track rule.name) {
+            <li>
+              <div class="rule-header">
+                <span class="rule-name">{{ rule.name }}</span>
+                <span class="rule-strength">{{ rule.activation | number: '1.2-2' }}</span>
+              </div>
+              <div class="bar small">
+                <div class="fill" [style.width.%]="rule.activation * 100"></div>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    }
   `,
   styles: [`
     h3 {
@@ -90,6 +107,18 @@ import { RuleResult } from './simulation.types';
     .advice-ok      { background: #d1fae5; color: #065f46; }
     .advice-warning { background: #fef3c7; color: #92400e; }
     .advice-danger  { background: #fee2e2; color: #991b1b; }
+
+    .rule-group { margin-bottom: 0.75rem; }
+    .rule-group:last-of-type { margin-bottom: 0; }
+
+    .group-title {
+      margin: 0.5rem 0 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #6b7280;
+    }
 
     .rules { list-style: none; padding: 0; margin: 0; }
     .rules li { margin-bottom: 0.6rem; }
@@ -139,6 +168,17 @@ import { RuleResult } from './simulation.types';
 })
 export class RuleResultsComponent {
   readonly result = input.required<RuleResult>();
+
+  readonly ruleGroups = computed<RuleGroup[]>(() => {
+    const rules = this.result().activatedRules;
+    return RULE_GROUP_ORDER
+      .map(({ outputVar, label }) => ({
+        outputVar,
+        label,
+        rules: rules.filter((r) => r.outputVar === outputVar),
+      }))
+      .filter((group) => group.rules.length > 0);
+  });
 
   accelLabel(v: number): string {
     if (v <= -0.5) return 'Mocne hamowanie';

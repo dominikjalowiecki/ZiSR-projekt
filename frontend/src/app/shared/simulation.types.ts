@@ -1,5 +1,6 @@
 export interface RuleActivation {
   name: string;
+  outputVar: string;
   activation: number;
 }
 

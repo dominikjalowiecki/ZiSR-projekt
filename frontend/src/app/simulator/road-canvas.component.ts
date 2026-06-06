@@ -52,7 +52,7 @@ const LEFT_LANE_CENTER = 115;
           }
           @if (c.lane < 0.5) {
             @if (c.distance < -1) {
-              <div class="badge crash">przejechano lead</div>
+              <div class="badge crash">przejechano przód</div>
             } @else if (c.distance < 5) {
               <div class="badge crash">blisko kolizji</div>
             }

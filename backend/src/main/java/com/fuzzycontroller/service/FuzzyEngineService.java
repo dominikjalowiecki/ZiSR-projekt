@@ -47,7 +47,7 @@ public class FuzzyEngineService {
     private final Map<String, Map<String, FuzzySet>> premiseSetsByVariable = new LinkedHashMap<>();
 
     private record AntecedentSpec(String variable, String set) {}
-    private record RuleDef(String name, List<AntecedentSpec> antecedents) {}
+    private record RuleDef(String name, String outputVar, List<AntecedentSpec> antecedents) {}
     private final List<RuleDef> ruleDefs = new ArrayList<>();
 
     @PostConstruct
@@ -455,7 +455,7 @@ public class FuzzyEngineService {
             specs.add(new AntecedentSpec(a.var, a.set));
         }
 
-        ruleDefs.add(new RuleDef(name, specs));
+        ruleDefs.add(new RuleDef(name, outVar, specs));
     }
 
     private Map<String, Map<String, Double>> fuzzifyAll(Map<String, Double> inputValues) {
@@ -487,7 +487,7 @@ public class FuzzyEngineService {
             }
             
             if (activation > RULE_ACTIVATION_DISPLAY_THRESHOLD) {
-                activations.add(new RuleActivation(def.name, activation));
+                activations.add(new RuleActivation(def.name, def.outputVar, activation));
             }
         }
         
